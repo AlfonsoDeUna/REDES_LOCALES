@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123e61">
+  <meta name="description" content="Laboratorio interactivo de Redes Locales: encapsulación TCP/IP, routers, protocolos, cabeceras, seguridad e ICMP. UT2 · 1.º SMR.">
+  <title>Dentro del paquete · Laboratorio TCP/IP</title>
+  <style>/* STYLES */</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <button class="sidebar-shade" id="sidebar-shade" aria-label="Cerrar índice" hidden></button>
+  <aside class="sidebar" id="sidebar" aria-label="Índice de la clase">
+    <a class="brand" href="#inicio" aria-label="Dentro del paquete, inicio">
+      <span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 5 34 13v15l-14 8-14-8V13L20 5Z" stroke="currentColor" stroke-width="2"/><path d="m6 13 14 8 14-8M20 21v15M13 9l14 8v7" stroke="currentColor" stroke-width="2"/></svg></span>
+      <span>Dentro del paquete<small>LABORATORIO TCP/IP</small></span>
+    </a>
+    <div class="course-label"><span class="status-dot"></span> REDES LOCALES · 1.º SMR</div>
+    <p class="nav-label">TU RECORRIDO</p>
+    <nav id="chapter-nav"></nav>
+    <div class="sidebar-bottom">
+      <div class="progress-label"><span>Bloques completados</span><strong id="progress-count">0/8</strong></div>
+      <div class="progress-track"><span id="progress-fill"></span></div>
+      <p>Explora, equivócate y vuelve a probar.<br>Tus respuestas se guardan en este navegador.</p>
+      <button class="text-btn" id="sources-open">Fuentes y modelo de la simulación <span aria-hidden="true">↗</span></button>
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left"><button class="icon-btn menu-btn" id="menu-open" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir índice">☰</button><span>UT2 <span class="crumb-sep">/</span> Arquitectura de redes</span></div>
+      <div class="topbar-tools">
+        <button class="btn small" id="teacher-open"><span aria-hidden="true">▤</span> Guía docente</button>
+        <button class="btn small" id="projector-toggle" aria-pressed="false"><span aria-hidden="true">▣</span> Proyector</button>
+        <button class="icon-btn" id="fullscreen-toggle" aria-label="Pantalla completa" title="Pantalla completa">⛶</button>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <header id="scene-heading" class="scene-heading"></header>
+      <div id="scene"></div>
+      <details id="reflection" class="reflection"><summary><span aria-hidden="true">✎</span> Mi explicación <span class="muted">· una frase para pensar</span></summary><label for="reflection-text" id="reflection-prompt">¿Qué has descubierto?</label><textarea id="reflection-text" rows="3" maxlength="4000" placeholder="Explica con tus palabras lo que has observado…"></textarea><span class="save-label" id="reflection-save">Se guarda en este navegador.</span></details>
+      <footer class="chapter-footer"><button class="btn" id="chapter-prev">← Anterior</button><span id="chapter-number"></span><button class="btn primary" id="chapter-next">Continuar →</button></footer>
+    </main>
+    <footer class="site-footer">REDES LOCALES <span>UT2 · Observar. Probar. Explicar.</span><span>Simulaciones didácticas · Datos ficticios</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="info-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title"></h2><button class="icon-btn" id="dialog-close" aria-label="Cerrar">×</button></div><div id="dialog-content"></div></dialog>
+  <script>/* SCRIPTS */</script>
+</body>
+</html>
