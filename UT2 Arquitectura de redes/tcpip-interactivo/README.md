@@ -11,10 +11,10 @@ Presentación web interactiva de **Redes Locales, 1.º SMR · UT2: Arquitectura 
 | 00 · Antes de enviar | Formular una predicción sobre lo que viaja por la red. |
 | 01 · El viaje del mensaje | Observar la encapsulación y desencapsulación paso a paso. |
 | 02 · El paso por routers | Comparar direcciones IP, MAC, TTL y puertos en enlaces consecutivos. |
-| 03 · El equipo de protocolos | Relacionar 11 protocolos con su función y su capa; comparar cinco pilas. |
+| 03 · Protocolos de TCP/IP | Relacionar 11 protocolos con su función y su capa; comparar cinco pilas. |
 | 04 · Construye una PDU | Montar una trama e inspeccionar la relación entre cabeceras y datos. |
 | 05 · Explora las cabeceras | Consultar TCP e IPv4, localizar ocho campos y explicar su función. |
-| 06 · Laboratorio de seguridad | Simular cuatro incidentes, predecir sus consecuencias y aplicar defensas. |
+| 06 · Tipos de ataques | Observar tres ejemplos sencillos: escuchar, hacerse pasar por otro y saturar; comparar comunicación normal, ataque y protección. |
 | 07 · ICMP y ping | Interpretar respuestas, pérdidas, TTL agotado y ausencia de ruta. |
 | 08 · Misión final | Resolver seis situaciones que conectan los conceptos anteriores. |
 | 09 · Mi cuaderno | Revisar respuestas, completar el ticket de salida y descargar las evidencias. |
@@ -60,10 +60,10 @@ Descarga el cuaderno antes de cambiar de dispositivo, borrar los datos del naveg
 
 - Se utiliza el modelo TCP/IP de cuatro capas: aplicación, transporte, Internet y acceso a red. El mapa de OSI explica la correspondencia de responsabilidades; no presupone siete cabeceras independientes.
 - Los diagramas principales muestran Ethernet II, IPv4 y TCP, sin NAT, VLAN ni opciones de cabecera. Las direcciones IP de los ejemplos están reservadas para documentación.
-- La encapsulación parte de una conexión TCP ya establecida. El saludo de tres mensajes se explora en el laboratorio de seguridad.
+- La encapsulación parte de una conexión TCP ya establecida. El bloque de ataques utiliza ejemplos visuales sencillos y no exige estudiar el saludo TCP.
 - En el constructor, los datos de aplicación se limitan a **1460 bytes UTF-8**: con 20 bytes de TCP y 20 de IPv4 se respeta una MTU de 1500 bytes. La segmentación TCP queda fuera de ese montaje. Los saltos de línea cuentan como CRLF y los recortes se avisan en pantalla.
 - La trama cuenta cabecera Ethernet y FCS. El modelo excluye preámbulo, delimitador de inicio e intervalo entre tramas; añade relleno cuando es necesario.
-- Los incidentes de ARP falsificado, IP de origen falsa, conexiones TCP incompletas y HTTP frente a HTTPS son **simulaciones locales**. No generan paquetes, no escanean equipos y no realizan ataques reales.
+- Los tres casos de seguridad —escuchar mensajes, hacerse pasar por otro equipo y saturar un servidor— son **simulaciones locales**. La comparación normal/ataque/protección y una pregunta breve permiten explicar la acción del atacante y su consecuencia. Los detalles técnicos se ofrecen como ampliación opcional. No se genera tráfico de red real.
 - Los tiempos, pérdidas y capturas de ping son ficticios. La práctica opcional con un ping real se realiza fuera de la web y con los equipos que indique el profesor.
 - HTTPS se ilustra con HTTP/1.1 sobre TLS y TCP. La actividad aclara que HTTP/3 utiliza una combinación diferente, con QUIC sobre UDP.
 

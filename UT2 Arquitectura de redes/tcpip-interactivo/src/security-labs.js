@@ -7,76 +7,91 @@
     return `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">${paths[name] || paths.pc}</svg>`;
   };
   const cases = [
-    {id:'access',layer:'Acceso a la red',title:'¿Y si la puerta de enlace fuera otra?',short:'ARP falsificado',color:'violet',lead:'Un equipo acepta una asociación IP–MAC que no corresponde a su puerta de enlace.',question:'La IP de la puerta de enlace no cambia. ¿Por qué las tramas llegan al equipo intruso?',answers:['Porque cambia la asociación entre la IP de la puerta de enlace y su MAC.','Porque TCP cambia el puerto de destino por sí solo.','Porque ARP cifra el contenido de la trama.'],correct:0,explain:'ARP relaciona una dirección IPv4 del enlace local con una MAC. Una asociación falsa puede desviar las tramas. ARP no se transporta dentro de TCP ni de IPv4.',defense:'Validar las asociaciones ARP',source:'https://www.rfc-editor.org/rfc/rfc826.html',sourceLabel:'RFC 826 · ARP'},
-    {id:'internet',layer:'Internet',title:'¿Una IP de origen demuestra quién envía?',short:'IP de origen falsa',color:'amber',lead:'El paquete declara un remitente distinto. Observa dónde iría una respuesta.',question:'Si se suplanta una IP de origen ajena, ¿qué ocurre normalmente con la respuesta?',answers:['Siempre regresa al equipo que falsificó la cabecera.','Se encamina hacia la IP declarada, que puede ser de otro equipo.','La IP de destino se convierte automáticamente en la IP real.'],correct:1,explain:'Los routers encaminan la respuesta hacia la dirección declarada como origen. Falsificar ese campo no da automáticamente acceso a las respuestas ni completa una conexión TCP.',defense:'Activar filtro de origen',source:'https://www.rfc-editor.org/rfc/rfc2827.html',sourceLabel:'RFC 2827 · Filtrado de origen'},
-    {id:'transport',layer:'Transporte',title:'¿Qué pasa si nadie termina de conectar?',short:'Cola de conexiones',color:'teal',lead:'El servidor reserva recursos mientras espera el último ACK. Nuestra cola didáctica tiene seis plazas.',question:'¿Qué recurso pretende agotar un SYN flood clásico?',answers:['La tabla de nombres DNS del navegador.','El número de direcciones MAC del cliente.','El estado reservado para conexiones TCP que aún no se han completado.'],correct:2,explain:'Las solicitudes que quedan a medias pueden ocupar el estado disponible. Las SYN cookies permiten posponer la reserva hasta validar el ACK. No solucionan por sí solas toda saturación de la red.',defense:'Activar SYN cookies',source:'https://www.rfc-editor.org/rfc/rfc4987.html',sourceLabel:'RFC 4987 · SYN flood'},
-    {id:'application',layer:'Aplicación',title:'¿Qué puede leer alguien en el camino?',short:'HTTP frente a HTTPS',color:'blue',lead:'Compara el contenido visible en una captura de HTTP con el contenido protegido por TLS.',question:'Al usar HTTPS correctamente, ¿qué puede seguir viendo un observador de la red?',answers:['El texto HTTP completo, incluido cualquier dato enviado.','Metadatos como IP, puertos y tamaño aproximado; no el contenido HTTP protegido.','Absolutamente nada: ni direcciones IP ni puertos.'],correct:1,explain:'TLS protege los datos de aplicación en tránsito. Las cabeceras IP y TCP y cierta información de tráfico siguen siendo visibles. Capturar tráfico puede observar varias capas; no es un ataque exclusivo de una sola capa.',defense:'Proteger con HTTPS/TLS',source:'https://www.rfc-editor.org/rfc/rfc8446.html',sourceLabel:'RFC 8446 · TLS 1.3'}
+    {
+      id:'listen',short:'Escuchar mensajes',title:'¿Puede leer el mensaje alguien más?',color:'blue',
+      lead:'Tu ordenador envía un mensaje al servidor. Alguien que observa la comunicación intenta leerlo.',
+      question:'¿Qué cambia al proteger el mensaje con HTTPS?',
+      answers:['El mensaje deja de viajar por la red.','El observador ya no puede leer el contenido del mensaje.','El servidor tampoco puede leer el mensaje.'],correct:1,
+      explain:'El mensaje sigue llegando al servidor, pero su contenido viaja cifrado. El observador puede ver que hay tráfico, aunque no pueda leer ese mensaje.',
+      stages:[
+        {action:'Tu ordenador envía el mensaje.',effect:'El servidor lo recibe y lo lee.'},
+        {action:'El atacante escucha la comunicación y copia el mensaje.',effect:'Puede leerlo porque viaja sin cifrar. El mensaje también llega al servidor.'},
+        {action:'La conexión usa HTTPS para cifrar el contenido.',effect:'El servidor puede leerlo; el observador de la red no.'}
+      ],
+      detail:'Escuchar tráfico se llama captura o sniffing. No toda captura es un ataque: también se usa para diagnosticar redes. Aquí el problema es leer sin permiso un mensaje que viaja sin cifrar. HTTPS utiliza TLS para proteger el contenido en tránsito; no oculta todo, por ejemplo las direcciones IP siguen siendo visibles.',
+      source:'https://www.rfc-editor.org/rfc/rfc8446.html',sourceLabel:'TLS y protección del contenido'
+    },
+    {
+      id:'impersonate',short:'Hacerse pasar por otro',title:'¿Y si entrego el mensaje al impostor?',color:'violet',
+      lead:'Para salir de su red, tu ordenador entrega el mensaje al router. Un atacante intenta ocupar ese lugar.',
+      question:'¿Qué pretende conseguir el atacante al hacerse pasar por el router?',
+      answers:['Que mi ordenador le entregue los mensajes creyendo que es el router.','Que el servidor funcione más rápido.','Que el mensaje se cifre automáticamente.'],correct:0,
+      explain:'El atacante engaña al ordenador para recibir mensajes que debían ir al router. Comprobar qué equipo es el router ayuda a evitar ese desvío.',
+      stages:[
+        {action:'Tu ordenador entrega el mensaje al router verdadero.',effect:'El router lo encamina hacia el servidor.'},
+        {action:'El atacante anuncia: «Yo soy tu router».',effect:'Si el ordenador se lo cree, entrega el mensaje al impostor.'},
+        {action:'La red comprueba quién es el router y rechaza el anuncio falso.',effect:'El mensaje vuelve a ir al equipo correcto.'}
+      ],
+      detail:'Este caso representa una suplantación ARP en una red local. El atacante intenta asociar su propia dirección MAC con la IP del router. Algunas redes pueden validar esas asociaciones para rechazar anuncios falsos. Aquí no cambiamos el servidor de destino: engañamos al ordenador sobre el siguiente equipo al que debe entregar el mensaje.',
+      source:'https://www.rfc-editor.org/rfc/rfc826.html',sourceLabel:'ARP: encontrar el siguiente equipo'
+    },
+    {
+      id:'overload',short:'Saturar un servidor',title:'¿Y si llegan demasiadas peticiones?',color:'teal',
+      lead:'Un servidor tiene una capacidad limitada. Un atacante intenta ocuparla con una avalancha de peticiones.',
+      question:'¿Qué consecuencia busca el atacante al saturar el servidor?',
+      answers:['Que todos los mensajes se vuelvan secretos.','Que el servidor tenga más tiempo libre.','Que tarde en responder o deje de atender a los usuarios.'],correct:2,
+      explain:'Demasiado trabajo puede dejar al servidor sin capacidad para atender a los usuarios. Limitar el tráfico abusivo puede ayudar a mantener el servicio.',
+      stages:[
+        {action:'Llegan unas pocas peticiones de los usuarios.',effect:'El servidor tiene capacidad y responde.'},
+        {action:'El atacante envía muchas peticiones seguidas.',effect:'El servidor se sobrecarga: la petición del alumno se queda esperando.'},
+        {action:'Un filtro limita las peticiones abusivas.',effect:'En este ejemplo, el servidor vuelve a poder atender al alumno.'}
+      ],
+      detail:'Se trata de una denegación de servicio: impedir que otros puedan usar un servicio. Puede afectar a la red, al transporte o a la aplicación. Las medidas dependen de lo que se esté saturando. Limitar peticiones es una defensa posible, pero no garantiza resolver todos los ataques.',
+      source:'https://www.rfc-editor.org/rfc/rfc4732.html',sourceLabel:'Denegación de servicio'
+    }
   ];
   const node = (label,sub,type,cls='') => `<div class="security-node ${cls}">${icon(type)}<strong>${label}</strong><span>${sub}</span></div>`;
-  const connection = (label,cls='') => `<div class="security-wire ${cls}"><span>${label}</span><i></i></div>`;
+  const connection = (label,cls='') => `<div class="security-wire ${cls}"><span>${label}</span><i><b class="security-moving-message" aria-hidden="true"></b></i></div>`;
   window.LabModules.security = {
-    render() { return `<div class="security-lab"><div class="security-intro"><span class="chip">LABORATORIO SIMULADO</span><p>Predice, provoca el incidente y comprueba la defensa. Todos los equipos, mensajes y valores son ficticios.</p></div><div class="security-tabs" role="group" aria-label="Casos por capa"></div><div class="security-case"></div></div>`; },
+    render() { return `<div class="security-lab security-simple"><div class="security-intro"><span class="chip">TRES ATAQUES, PASO A PASO</span><p>Observa qué hace el atacante, qué consigue y cómo podemos proteger la comunicación.</p></div><div class="security-tabs" role="group" aria-label="Elige un caso de seguridad"></div><div class="security-case"></div></div>`; },
     mount(root,api) {
-      let state = api.load('security-state',{caseId:'access',stage:0,syn:0,handshake:0,note:''});
-      state = Object.assign({caseId:'access',stage:0,syn:0,handshake:0,note:''},state);
-      if (!cases.some(c => c.id === state.caseId)) state.caseId = 'access';
-      let answered = api.load('security-answers',{});
-      const host = root.querySelector('.security-case');
-      const tabs = root.querySelector('.security-tabs');
-      const save = () => api.save('security-state',state);
+      const previous=api.load('security-state',{});
+      const previousCaseValid=cases.some(c=>c.id===previous.caseId);
+      let state={caseId:previousCaseValid?previous.caseId:'listen',stage:previousCaseValid&&[0,1,2].includes(previous.stage)?previous.stage:0};
+      const answered=api.load('security-answers',{})||{};
+      const host=root.querySelector('.security-case'),tabs=root.querySelector('.security-tabs');
+      const save=()=>api.save('security-state',state);
       function drawNetwork(c) {
-        const bad = state.stage === 1, fixed = state.stage === 2;
-        if (c.id === 'access') {
-          return `<div class="security-net" aria-label="Tramas desde el PC hacia la MAC de la puerta de enlace">${node('PC del aula','192.0.2.10','pc')}${connection(bad?'Trama desviada':'Trama al gateway',bad?'bad':'active')}${node(bad?'Equipo intruso':'Puerta de enlace',bad?'MAC …:99':'MAC …:01',bad?'eye':'router',bad?'danger':fixed?'safe':'')}</div><div class="security-arp"><div><span class="security-small-label">IP que queremos alcanzar en la LAN</span><strong>192.0.2.1</strong></div><div><span class="security-small-label">MAC guardada en el PC</span><strong class="${bad?'security-red':'security-green'}">02:00:00:00:00:${bad?'99':'01'}</strong></div><span class="security-status ${bad?'danger':fixed?'safe':''}">${bad?'Asociación falsa':fixed?'Asociación validada':'Asociación correcta'}</span></div><p class="security-result">${bad?'La IP destino final del paquete puede seguir siendo la del servidor. La trama Ethernet del siguiente salto se dirige a la MAC equivocada.':fixed?'La inspección ARP dinámica (DAI), con una base de asociaciones fiable y puertos bien configurados, puede rechazar anuncios falsos. En un entorno pequeño también se pueden fijar asociaciones concretas.':'El PC utiliza la MAC de su puerta de enlace para enviar tráfico hacia una red remota. La MAC del servidor remoto no se busca con ARP en esta LAN.'}</p><details class="security-detail"><summary>¿Y un fallo físico?</summary><p>Si el cable se desconecta, el enlace deja de transportar las tramas. No es lo mismo perder conectividad que desviar tráfico mediante una asociación ARP falsa.</p></details>`;
+        const attack=state.stage===1,protectedNow=state.stage===2;
+        if(c.id==='listen') {
+          return `<div class="security-flow">${node('Tu ordenador','Envía el mensaje','pc')}${connection(protectedNow?'Contenido cifrado':'Mensaje sin cifrar',protectedNow?'safe':'active')}${node('Servidor','Recibe el mensaje','server')}</div><div class="security-original-message"><span>El mensaje que enviamos</span><strong>«Quedamos a las 17:00»</strong></div><div class="security-observer ${attack?'attack':protectedNow?'protected':''}"><div>${icon('eye')}<strong>${state.stage===0?'¿Y si alguien escucha?':'El observador de la red'}</strong></div><p>${state.stage===0?'Pulsa «Ver ataque» para descubrirlo.':attack?'Puede leer: «Quedamos a las 17:00»':'Ve contenido cifrado: ▪ ▪ ▪ ▪ ▪ ▪ ▪ ▪'}</p><span>${state.stage===0?'El mensaje está viajando en claro.':attack?'Ha copiado el mensaje. No necesita detenerlo.':'No puede leer este mensaje, aunque ve que hay tráfico.'}</span></div>`;
         }
-        if (c.id === 'internet') {
-          return `<div class="security-net">${node('Emisor real','192.0.2.10','pc')}${connection(fixed?'Paquete rechazado':bad?'Origen declarado: 198.51.100.77':'Origen: 192.0.2.10',fixed?'blocked':bad?'bad':'active')}${node(fixed?'Filtro de origen':'Servidor',fixed?'Prefijo esperado: 192.0.2.0/24':'203.0.113.20',fixed?'shield':'server',fixed?'safe':'')}</div><div class="security-ip-header"><span class="security-small-label">CABECERA IPv4 OBSERVADA</span><div><span>IP origen</span><strong>${state.stage?'198.51.100.77':'192.0.2.10'}</strong></div><div><span>IP destino</span><strong>203.0.113.20</strong></div><div><span>La respuesta se dirigiría a</span><strong>${state.stage?'198.51.100.77':'192.0.2.10'}</strong></div></div><p class="security-result">${fixed?'El filtro conoce qué prefijos pueden proceder de esta conexión y descarta una dirección incoherente. No detecta necesariamente una suplantación dentro de un prefijo permitido.':bad?'El servidor no obtiene la identidad real del emisor a partir de esa cabecera. Su respuesta sigue la ruta hacia 198.51.100.77, no necesariamente hacia quien envió el paquete.':'La IP origen sirve para direccionar la respuesta; por sí sola no autentica la identidad de una persona ni de una aplicación.'}</p>`;
+        if(c.id==='impersonate') {
+          return `<div class="security-flow three">${node('Tu ordenador','¿A quién lo entrego?','pc')}${connection(attack?'Se cree el engaño':'Equipo correcto',attack?'bad':'active')}${node(attack?'El impostor':'Router verdadero',attack?'«Yo soy tu router»':protectedNow?'Identidad comprobada':'Sale hacia otra red',attack?'eye':protectedNow?'shield':'router',attack?'danger':protectedNow?'safe':'')}${connection(attack?'Puede reenviarlo':'Lo encamina',attack?'bad':'active')}${node('Servidor','Destino del mensaje','server')}</div><div class="security-delivery ${attack?'attack':protectedNow?'protected':''}"><span>¿Quién recibe primero tu mensaje?</span><strong>${attack?'El impostor': 'El router verdadero'}</strong><p>${attack?'El ordenador quería entregarlo al router, pero ha aceptado una indicación falsa.':protectedNow?'El anuncio del impostor se rechaza. El mensaje sigue el camino correcto.':'El ordenador reconoce al equipo al que debe entregar los mensajes para salir de su red.'}</p></div>`;
         }
-        if (c.id === 'transport') {
-          const occupied = fixed ? 0 : Math.min(6, state.syn + ((state.handshake === 1 || state.handshake === 2) ? 1 : 0));
-          const handshakeText = ['Cliente listo para conectar','SYN: el cliente solicita conexión','SYN-ACK: el servidor responde','ACK: conexión establecida'][state.handshake];
-          return `<div class="security-handshake"><span class="${state.handshake>=1?'active':''}">1. SYN →</span><span class="${state.handshake>=2?'active':''}">2. ← SYN-ACK</span><span class="${state.handshake>=3?'active':''}">3. ACK →</span></div><p class="security-small">${handshakeText}</p><div class="security-queue-header"><strong>Conexiones incompletas</strong><span>${occupied} / 6 plazas ${fixed?'· SYN cookies activas':''}</span></div><div class="security-queue" aria-label="${occupied} de seis plazas ocupadas">${Array.from({length:6},(_,i)=>`<div class="security-slot ${i<occupied?'busy':''}"><span>${String(i+1).padStart(2,'0')}</span><strong>${i<occupied?'Espera ACK':'Libre'}</strong></div>`).join('')}</div><div class="security-actions"><button class="btn" data-security-action="handshake">${state.handshake===3?'Repetir conexión normal':'Paso del saludo TCP'}</button><button class="btn" data-security-action="syn">Añadir 2 SYN sin ACK</button><button class="btn" data-security-action="legit">Probar cliente legítimo</button></div><p class="security-result">${state.note || (fixed?'El servidor codifica información en su SYN-ACK y comprueba el ACK antes de reservar el estado de la conexión. La reserva pendiente se evita en este modelo; el tráfico sigue consumiendo red y procesamiento.':'Una petición normal completa los tres mensajes. Pulsa «Añadir 2 SYN sin ACK» y observa qué ocurre cuando se llena la cola.')}</p><p class="security-small">Seis plazas es una simplificación visual, no el límite de un servidor real. La escena no genera paquetes.</p>`;
-        }
-        return `<div class="security-net">${node('Navegador',fixed?'HTTPS · TCP 443':'HTTP · TCP 80','pc')}${connection(fixed?'TLS protege el contenido':'Contenido en claro',bad?'bad':fixed?'safe':'active')}${node('Servidor web','203.0.113.20','server')}</div><div class="security-capture ${fixed?'encrypted':bad?'exposed':''}"><div class="security-capture-heading">${icon('eye')}<strong>Lo que ve el observador</strong><span>${fixed?'TLS activo':bad?'Captura abierta':'Predice antes de observar'}</span></div>${state.stage===0?'<p class="security-hidden-payload">¿Podrá leer el nombre del equipo que consulta el marcador?</p>':`<pre>${fixed?'[Registro TLS: contenido cifrado]\n17 03 03 … a8 2f 91 …\n(representación ilustrativa, no cifrado real)':'GET /marcador?equipo=azul HTTP/1.1\r\nHost: aula.example\r\n\r\n'}</pre><div class="security-meta"><span>IP: 192.0.2.10 → 203.0.113.20</span><span>TCP: 51514 → ${fixed?'443':'80'}</span><span>Tamaño y tiempos: observables</span></div>`}</div><p class="security-result">${fixed?'TLS mantiene el contenido de aplicación protegido frente a un observador en tránsito si la conexión y la validación del certificado son correctas. El equipo y el servidor sí pueden leer sus propios datos.':bad?'HTTP sin TLS permite leer este contenido a quien consigue observar el tráfico. Ver paquetes con una herramienta de análisis no convierte una captura en maliciosa por sí misma.':'Aquí comparamos la confidencialidad del contenido. La captura de tráfico puede mostrar campos de enlace, IP, transporte y aplicación.'}</p>`;
+        const amount=attack?18:protectedNow?3:2;
+        return `<div class="security-flow">${node('Alumno','Pide una página','pc')}${connection(attack?'Su petición espera':'Envía una petición',attack?'bad':'active')}${node('Servidor',attack?'Está sobrecargado':'Puede atenderte','server',attack?'danger':protectedNow?'safe':'')}</div><div class="security-request-scene ${attack?'attack':protectedNow?'protected':''}"><div class="security-request-origin">${icon(attack?'eye':protectedNow?'shield':'pc')}<strong>${attack?'El atacante envía muchas peticiones':protectedNow?'El filtro limita las peticiones abusivas':'Llegan unas pocas peticiones'}</strong></div><div class="security-request-cloud" aria-label="${attack?'Muchas peticiones de golpe':protectedNow?'Se limita el tráfico que llega al servidor':'Pocas peticiones'}">${Array.from({length:amount},(_,i)=>`<span class="security-request" style="--request-delay:${i%6*110}ms" aria-hidden="true">Petición</span>`).join('')}</div><div class="security-load"><span>Trabajo del servidor</span><div><i style="width:${attack?100:protectedNow?35:22}%"></i></div><strong>${attack?'Sin capacidad libre':'Tiene capacidad libre'}</strong></div></div>`;
       }
-      function render() {
-        const c = cases.find(c => c.id === state.caseId);
-        tabs.innerHTML = cases.map((item,i)=>`<button class="security-tab ${item.id===c.id?'active':''}" aria-pressed="${item.id===c.id}" data-security-case="${item.id}"><span>0${i+1} · ${item.layer}</span><strong>${item.short}</strong>${answered[item.id]?.correct?'<b aria-label="Actividad resuelta">✓</b>':''}</button>`).join('');
-        host.innerHTML = `<section class="panel security-simulation ${c.color}" aria-label="${c.short}"><div class="security-case-heading"><div><span class="eyebrow">CASO ${cases.indexOf(c)+1} / 4 · ${c.layer.toUpperCase()}</span><h2>${c.title}</h2><p>${c.lead}</p></div><span class="security-phase">${['01 · Observar','02 · Incidente','03 · Defensa'][state.stage]}</span></div><div class="security-stage-buttons" role="group" aria-label="Estado del caso"><button class="btn ${state.stage===0?'primary':''}" data-security-stage="0">Situación inicial</button><button class="btn ${state.stage===1?'primary':''}" data-security-stage="1">${c.id==='application'?'Observar captura':'Simular incidente'}</button><button class="btn ${state.stage===2?'primary':''}" data-security-stage="2">${c.defense}</button></div><div aria-live="polite" class="security-scene">${drawNetwork(c)}</div></section><section class="panel security-question"><span class="eyebrow">EXPLICA LO QUE HA CAMBIADO</span><h3>${c.question}</h3><div class="security-options">${c.answers.map((answer,i)=>`<button class="security-option ${answered[c.id]?.index===i?(answered[c.id].correct?'selected-correct':'selected-wrong'):''}" data-security-answer="${i}"><span>${String.fromCharCode(65+i)}</span>${answer}</button>`).join('')}</div><div class="security-feedback" aria-live="polite">${answered[c.id]?`<p class="feedback ${answered[c.id].correct?'ok':'bad'}"><strong>${answered[c.id].correct?'Bien razonado.':'Revisa el recorrido.'}</strong> ${c.explain}</p>`:''}</div><a href="${c.source}" target="_blank" rel="noopener noreferrer" class="security-source">Consultar la fuente: ${c.sourceLabel} ↗</a></section>`;
+      function render(focusSelector) {
+        const c=cases.find(c=>c.id===state.caseId),stage=c.stages[state.stage];
+        tabs.innerHTML=cases.map((item,i)=>`<button type="button" class="security-tab ${item.id===c.id?'active':''}" aria-pressed="${item.id===c.id}" data-security-case="${item.id}"><span>CASO ${i+1}</span><strong>${item.short}</strong>${answered[item.id]?.correct?'<b aria-label="Actividad resuelta">✓</b>':''}</button>`).join('');
+        host.innerHTML=`<section class="panel security-simulation ${c.color}" aria-label="${c.short}"><div class="security-case-heading"><div><span class="eyebrow">CASO ${cases.indexOf(c)+1} DE 3</span><h2>${c.title}</h2><p>${c.lead}</p></div><span class="security-phase">${['Comunicación normal','Durante el ataque','Con protección'][state.stage]}</span></div><div class="security-stage-buttons" role="group" aria-label="Compara la comunicación"><button type="button" class="btn ${state.stage===0?'primary':''}" aria-pressed="${state.stage===0}" data-security-stage="0">Ver comunicación normal</button><button type="button" class="btn ${state.stage===1?'primary':''}" aria-pressed="${state.stage===1}" data-security-stage="1">Ver ataque</button><button type="button" class="btn ${state.stage===2?'primary':''}" aria-pressed="${state.stage===2}" data-security-stage="2">Proteger</button></div><div class="security-scene" aria-live="polite">${drawNetwork(c)}<div class="security-explanation"><div><span>QUÉ HACE</span><p>${stage.action}</p></div><div><span>QUÉ OCURRE</span><p>${stage.effect}</p></div></div></div></section><section class="panel security-question"><span class="eyebrow">COMPRUEBA SI LO HAS ENTENDIDO</span><h3>${c.question}</h3><div class="security-options">${c.answers.map((answer,i)=>`<button type="button" class="security-option ${answered[c.id]?.index===i?(answered[c.id].correct?'selected-correct':'selected-wrong'):''}" data-security-answer="${i}"><span>${String.fromCharCode(65+i)}</span>${answer}</button>`).join('')}</div><div class="security-feedback" aria-live="polite">${answered[c.id]?`<p class="feedback ${answered[c.id].correct?'ok':'bad'}"><strong>${answered[c.id].correct?'Correcto.':'Vuelve a observar el caso.'}</strong> ${c.explain}</p>`:''}</div><details class="security-detail"><summary>Para saber un poco más</summary><p>${c.detail}</p><a href="${c.source}" target="_blank" rel="noopener noreferrer" class="security-source">Fuente: ${c.sourceLabel} ↗</a></details></section><p class="security-simulation-note">Simulaciones para aprender: no se envía tráfico ni se ataca ningún equipo real.</p>`;
+        if(focusSelector){const control=root.querySelector(focusSelector);if(control)control.focus({preventScroll:true});}
       }
-      const onClick = event => {
-        const target = event.target.closest('button'); if (!target || !root.contains(target)) return;
-        if (target.hasAttribute('data-security-case')) { state={caseId:target.dataset.securityCase,stage:0,syn:0,handshake:0,note:''}; save();render(); }
-        if (target.hasAttribute('data-security-stage')) {
-          state.stage=Number(target.dataset.securityStage);state.syn=state.stage===1&&state.caseId==='transport'?6:0;state.handshake=0;state.note='';save();render();
-        }
-        if (target.hasAttribute('data-security-action')) {
-          const a=target.dataset.securityAction;
-          if(a==='syn') {
-            state.handshake=0;
-            if(state.stage===2)state.note='Llegan dos SYN. Con SYN cookies, este modelo no reserva plazas mientras espera el ACK. El envío de SYN sigue consumiendo ancho de banda y procesamiento.';
-            else{state.stage=1;state.syn=Math.min(6,state.syn+2);state.note=state.syn===6?'La cola está llena: seis conexiones incompletas esperan un ACK. Prueba ahora un cliente legítimo.':`Hay ${state.syn} conexiones incompletas esperando el último ACK.`;}
-          }
-          if(a==='legit') {
-            state.note=state.stage!==2&&state.syn===6?'El cliente legítimo no consigue una plaza en esta cola llena. La disponibilidad del servicio se ve afectada.':'El cliente legítimo completa el saludo TCP y establece una conexión. La cola puede atenderlo.';
-            if(state.stage===2||state.syn<6)state.handshake=3;
-          }
-          if(a==='handshake') {
-            if(state.handshake===0&&state.stage!==2&&state.syn===6)state.note='No hay plaza para este cliente: aplica la defensa o vuelve a la situación inicial.';
-            else {state.handshake=(state.handshake+1)%4;state.note=['Cliente preparado para una nueva conexión.','El cliente envía SYN. El servidor recibe una solicitud de conexión.','El servidor envía SYN-ACK y espera el último ACK.','El cliente confirma con ACK. La conexión pasa a establecida.'][state.handshake];}
-          }
-          save();render();
-        }
+      function onClick(event) {
+        const target=event.target.closest('button');if(!target||!root.contains(target))return;
+        if(target.hasAttribute('data-security-case')) {state={caseId:target.dataset.securityCase,stage:0};save();render(`[data-security-case="${state.caseId}"]`);}
+        if(target.hasAttribute('data-security-stage')) {state.stage=Number(target.dataset.securityStage);save();render(`[data-security-stage="${state.stage}"]`);}
         if(target.hasAttribute('data-security-answer')) {
-          const c=cases.find(c=>c.id===state.caseId), index=Number(target.dataset.securityAnswer), correct=index===c.correct;
+          const c=cases.find(c=>c.id===state.caseId),index=Number(target.dataset.securityAnswer),correct=index===c.correct;
           answered[c.id]={index,correct};api.save('security-answers',answered);
           api.record('security-'+c.id,{question:c.question,answer:c.answers[index],correct,feedback:c.explain});
-          if(cases.every(item=>answered[item.id]?.correct))api.markComplete('security','Cuatro incidentes analizados','Identifica el fallo y su mitigación en las cuatro capas.');
-          render();
+          if(cases.every(item=>answered[item.id]?.correct))api.markComplete('security','Tres ataques comprendidos','Explica cómo escuchar, suplantar y saturar afectan a una comunicación.');
+          render(`[data-security-answer="${index}"]`);
         }
-      };
+      }
       root.addEventListener('click',onClick);render();
-      return () => root.removeEventListener('click',onClick);
+      return ()=>root.removeEventListener('click',onClick);
     }
   };
 
@@ -93,7 +108,7 @@
     mount(root,api) {
       const saved=api.load('icmp-settings',{destination:'203.0.113.20',scenario:'success',ttl:64});
       let settings={destination:['203.0.113.20','203.0.113.30'].includes(saved.destination)?saved.destination:'203.0.113.20',scenario:pingScenarios[saved.scenario]?saved.scenario:'success',ttl:Math.max(1,Math.min(64,Number(saved.ttl)||64))};
-      let packet=0,phase=-1,results=[],timer=null,running=false,lastEvent='Prepara una predicción: con dos routers, ¿llegará una solicitud con TTL 2?',lastNode=-1,reverse=false,type=8;
+      let packet=0,phase=-1,results=[],timer=null,running=false,lastEvent='Prepara una predicción: con dos routers, ¿llegará una solicitud con TTL 2?',lastNode=-1,lastLink=-1,reverse=false,type=8;
       let answer=null;
       const qs=s=>root.querySelector(s);
       qs('[data-icmp="destination"]').value=settings.destination;qs('[data-icmp="scenario"]').value=settings.scenario;qs('[data-icmp="ttl"]').value=settings.ttl;
@@ -109,7 +124,7 @@
       function line(r){if(r.kind==='reply')return `Respuesta desde ${r.ip}: bytes=32 tiempo=${r.rtt}ms TTL=${r.replyTTL}`;if(r.kind==='ttl')return `Respuesta desde ${r.ip}: TTL agotado en tránsito. [ICMP 11/0]`;if(r.kind==='unreachable')return `Respuesta desde ${r.ip}: Red de destino inaccesible. [ICMP 3/0]`;return 'Tiempo de espera agotado para esta solicitud.';}
       function drawRoute(){
         const labels=[['Mi PC','192.0.2.10','pc'],['Router 1','192.0.2.1','router'],['Router 2','198.51.100.2','router'],['Servidor',settings.destination,'server']];
-        qs('.icmp-route').innerHTML=labels.map((item,i)=>`${i?`<div class="icmp-link ${lastNode===i||lastNode===i-1?'active':''} ${reverse?'reverse':''}"><span>${reverse?'←':'→'}</span></div>`:''}<div class="icmp-node ${lastNode===i?'active':''} ${lastNode===i&&(type===3||type===11)?'icmp-error-node':''}">${icon(item[2])}<strong>${item[0]}</strong><span>${item[1]}</span><small>${i===0?'Origen':i===3?'Responde con su propio TTL':`TTL de ida: ${Math.max(0,settings.ttl-i)}`}</small></div>`).join('');
+        qs('.icmp-route').innerHTML=labels.map((item,i)=>`${i?`<div class="icmp-link ${lastLink===i-1?'active':''} ${reverse?'reverse':''}"><span>${reverse?'←':'→'}</span></div>`:''}<div class="icmp-node ${lastNode===i?'active':''} ${lastNode===i&&(type===3||type===11)?'icmp-error-node':''}">${icon(item[2])}<strong>${item[0]}</strong><span>${item[1]}</span><small>${i===0?'Origen':i===3?'Responde con su propio TTL':`TTL de ida: ${Math.max(0,settings.ttl-i)}`}</small></div>`).join('');
       }
       function questionHtml(){
         const complete=results.length===4,m=metrics();
@@ -117,7 +132,7 @@
       }
       function draw() {
         qs('.icmp-scenario-description').textContent=pingScenarios[settings.scenario].desc;
-        drawRoute();qs('.icmp-event').innerHTML=`<span class="icmp-event-badge">${results.length===4?'FINALIZADO':phase<0?'PREDICE':`SOLICITUD ${packet+1}`}</span><p>${lastEvent}</p>`;
+        drawRoute();qs('.icmp-event').innerHTML=`<span class="icmp-event-badge">${results.length===4?'FINALIZADO':phase<0?(results.length?`SOLICITUD ${results.length} · FINAL`:'PREDICE'):`SOLICITUD ${packet+1}`}</span><p>${lastEvent}</p>`;
         qs('.icmp-pdu').innerHTML=type===null?'<span class="icmp-no-response">Sin respuesta recibida</span>':`<span>Ethernet</span><span>IPv4 · protocolo 1</span><span class="icmp-message-type">ICMP · ${type===8?'Echo Request (8)':type===0?'Echo Reply (0)':type===11?'Time Exceeded (11)':'Destination Unreachable (3)'}</span><span class="icmp-payload">${type===3||type===11?'Cabecera IPv4 original + primeros 8 B de su carga (mínimo RFC 792)':'Datos de prueba: 32 B'}</span>`;
         qs('.icmp-counter').textContent=`${results.length} / 4 solicitudes completadas`;
         const m=metrics();
@@ -130,28 +145,61 @@
         qs('.icmp-interpretation').innerHTML=questionHtml();
       }
       function finish(result) {
-        results.push(result);lastNode=0;reverse=true;type=result.type;
-        if(result.kind==='reply')lastEvent=`Echo Reply recibido. ${result.rtt} ms de ida y vuelta; su TTL restante es 62. La solicitud y la respuesta son paquetes distintos.`;
-        if(result.kind==='ttl')lastEvent=`R${result.router} devuelve ICMP tipo 11, código 0: el TTL de la solicitud ha llegado a cero. El destino no ha recibido este Echo Request.`;
-        if(result.kind==='unreachable')lastEvent='R2 devuelve ICMP tipo 3, código 0: no tiene ruta hacia la red de destino. Es un error recibido, no una respuesta de eco.';
+        results.push(result);lastNode=0;reverse=result.kind!=='timeout';type=result.type;
+        if(result.kind==='reply')lastEvent=`El PC recibe Echo Reply tras el recorrido servidor → R2 → R1 → PC. Han pasado ${result.rtt} ms de ida y vuelta; la respuesta llega con TTL 62.`;
+        if(result.kind==='ttl')lastEvent=`El PC recibe el error ICMP 11/0 desde R${result.router}. Ha vuelto por ${result.router===1?'R1 → PC':'R2 → R1 → PC'}. La petición se detuvo antes del servidor porque agotó su TTL.`;
+        if(result.kind==='unreachable')lastEvent='El PC recibe el error ICMP 3/0 tras recorrer R2 → R1 → PC. R2 no tenía ruta hacia el destino. El servidor no ha recibido la petición.';
         if(result.kind==='timeout')lastEvent='Se agota el tiempo de espera sin Echo Reply. Desde esta salida no podríamos distinguir por sí solos un filtrado, una pérdida u otra causa.';
         if(results.length===4){stop();api.save('icmp-last-result',{settings:Object.assign({},settings),metrics:metrics(),results});}
         else{packet++;phase=-1;}
       }
+      function packetTimeline(result) {
+        const events=[{node:0,link:-1,type:8,back:false,text:`El PC envía una petición de eco: Echo Request. Su TTL inicial es ${settings.ttl}.`}];
+        if(result.kind==='ttl'&&result.router===1) {
+          events.push(
+            {node:1,link:0,type:11,back:false,text:'R1 recibe la petición. El TTL pasa de 1 a 0: la petición se detiene aquí y R1 crea un mensaje de error.'},
+            {node:0,link:0,type:11,back:true,text:'El error vuelve directamente de R1 al PC. No ha pasado por R2 ni por el servidor.'}
+          );
+          return events;
+        }
+        events.push({node:1,link:0,type:8,back:false,text:`La petición llega a R1. El router reduce el TTL de ${settings.ttl} a ${settings.ttl-1} y la envía a R2.`});
+        if(result.kind==='ttl'||result.kind==='unreachable') {
+          events.push(
+            {node:2,link:1,type:result.type,back:false,text:result.kind==='ttl'?'La petición llega a R2. El TTL pasa de 1 a 0: R2 la detiene y crea un mensaje de error.':'La petición llega a R2, pero ese router no tiene una ruta hacia el destino. R2 crea un mensaje de error.'},
+            {node:1,link:1,type:result.type,back:true,text:'El nuevo mensaje de error vuelve de R2 a R1. R1 lo reenvía hacia el PC.'},
+            {node:0,link:0,type:result.type,back:true,text:'El PC recibe el error que ha viajado R2 → R1 → PC. La petición no llegó al servidor.'}
+          );
+          return events;
+        }
+        events.push({node:2,link:1,type:8,back:false,text:`La petición llega a R2. El router reduce el TTL de ${settings.ttl-1} a ${settings.ttl-2} y la envía hacia el servidor.`});
+        if(result.kind==='timeout') {
+          events.push(
+            settings.scenario==='filtered'
+              ?{node:3,link:2,type:null,back:false,text:'La petición alcanza el destino, pero una regla la descarta sin responder. Sabemos la causa porque controlamos esta simulación.'}
+              :{node:-1,link:2,type:null,back:false,text:'Esta petición se pierde en el enlace entre R2 y el servidor. No llega al servidor, así que no se crea una respuesta.'},
+            {node:0,link:-1,type:null,back:false,text:'El PC espera hasta que se agota el tiempo. No está regresando ningún paquete de respuesta.'}
+          );
+          return events;
+        }
+        events.push(
+          {node:3,link:2,type:0,back:false,text:'El servidor recibe la petición y crea la respuesta: Echo Reply. Es otro paquete y empieza con su propio TTL: 64.'},
+          {node:2,link:2,type:0,back:true,text:'La respuesta sale del servidor y llega a R2. R2 reduce su TTL de 64 a 63 y la envía hacia R1.'},
+          {node:1,link:1,type:0,back:true,text:'La respuesta llega ahora a R1. R1 reduce su TTL de 63 a 62 y la envía hacia el PC.'},
+          {node:0,link:0,type:0,back:true,text:'El PC recibe la respuesta. Ha vuelto por el camino servidor → R2 → R1 → PC y llega con TTL 62.'}
+        );
+        return events;
+      }
       function step() {
         if(results.length===4)return;
+        const result=outcome(packet),events=packetTimeline(result);
         phase++;
-        const result=outcome(packet);reverse=false;type=8;
-        if(phase===0){lastNode=0;lastEvent=`El PC crea Echo Request (tipo 8, código 0) dentro de IPv4, con TTL ${settings.ttl}. Empieza la solicitud ${packet+1}.`;}
-        else if(phase===1){lastNode=1;lastEvent=`R1 examina IPv4 y reduce el TTL: ${settings.ttl} → ${settings.ttl-1}. ${settings.ttl===1?'El valor llega a cero; descarta la solicitud y genera ICMP Time Exceeded.':'Reenvía el paquete hacia R2.'}`;if(settings.ttl===1){type=11;phase=4;}}
-        else if(phase===2){lastNode=2;lastEvent=`R2 examina IPv4 y reduce el TTL: ${settings.ttl-1} → ${settings.ttl-2}. ${settings.ttl===2?'Llega a cero: genera Time Exceeded.':settings.scenario==='unreachable'?'No hay una ruta para el destino: genera Destination Unreachable.':'Reenvía el paquete hacia el servidor.'}`;if(settings.ttl===2){type=11;phase=4;}else if(settings.scenario==='unreachable'){type=3;phase=4;}}
-        else if(phase===3){lastNode=3;if(result.kind==='timeout'){type=null;lastEvent=settings.scenario==='filtered'?'La regla del destino descarta Echo Request sin responder. Nosotros conocemos la causa porque controlamos la simulación.':'La tercera solicitud se pierde en este escenario. No se genera respuesta de eco.';}else{type=0;lastEvent='El servidor recibe Echo Request y crea Echo Reply (tipo 0). Su nuevo paquete IP comienza con TTL 64.';}}
-        else if(phase===4){lastNode=1;reverse=true;type=result.type;lastEvent=result.kind==='reply'?'Echo Reply vuelve por R2 y R1. Su TTL se reduce de 64 a 62. Las direcciones origen y destino están invertidas.':result.kind==='timeout'?'El PC sigue esperando. No ha recibido una respuesta ni un error ICMP.':'El error ICMP vuelve hacia la IP origen de la solicitud.';}
-        else finish(result);
+        const event=events[Math.min(phase,events.length-1)];
+        lastNode=event.node;lastLink=event.link;reverse=event.back;type=event.type;lastEvent=event.text;
+        if(phase===events.length-1)finish(result);
         draw();
       }
       function reset(keepMessage) {
-        stop();packet=0;phase=-1;results=[];lastNode=-1;reverse=false;type=8;answer=null;
+        stop();packet=0;phase=-1;results=[];lastNode=-1;lastLink=-1;reverse=false;type=8;answer=null;
         if(!keepMessage)lastEvent='Prepara una predicción: con dos routers, ¿llegará una solicitud con TTL 2?';
         draw();
       }
@@ -176,7 +224,7 @@
         if(action==='play'){
           if(running){stop();draw();return;}
           syncSettingsFromControls();
-          if(results.length===4)reset();running=true;qs('[data-icmp-action="play"]').textContent='Pausar';step();if(running)timer=setInterval(step,550);draw();
+          if(results.length===4)reset();running=true;qs('[data-icmp-action="play"]').textContent='Pausar';step();if(running)timer=setInterval(step,850);draw();
         }
         if(action==='check'){
           const lossInput=qs('[data-icmp="loss-answer"]'),conclusion=qs('[data-icmp="conclusion"]').value;

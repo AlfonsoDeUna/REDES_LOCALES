@@ -11,10 +11,10 @@ Una clase interactiva para Redes Locales de 1.º SMR. Sigue el viaje de un mensa
 1. Antes de enviar: predicción inicial.
 2. El viaje del mensaje: encapsulación y desencapsulación.
 3. El paso por routers: direcciones, TTL y nuevos enlaces.
-4. El equipo de protocolos: funciones, capas y pilas.
+4. Protocolos de TCP/IP: funciones, capas y pilas.
 5. Construye una PDU: cabeceras, datos y tamaños.
 6. Explora las cabeceras: campos de TCP e IPv4 y consulta de RFC.
-7. Laboratorio de seguridad: incidentes y defensas simulados.
+7. Tipos de ataques: escuchar mensajes, hacerse pasar por otro y saturar un servidor.
 8. ICMP y ping: respuestas, pérdidas y diagnóstico.
 9. Misión final: casos para relacionar lo aprendido.
 10. Mi cuaderno: evidencias y ticket de salida.
