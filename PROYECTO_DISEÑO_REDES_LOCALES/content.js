@@ -15,7 +15,7 @@ window.PORTAL_DATA = {
       image: 'assets/practicas/p7-image2.png',
       imageAlt: 'Imagen del laboratorio con los ordenadores distribuidos en las aulas de la oficina.',
       imageCaption: 'Referencia visual de la práctica original: los ordenadores ya están situados en sus aulas.',
-      doc: 'recursos/practica-7.docx',
+      doc: 'recursos/practica-7.pdf',
       icon: 'rooms'
     },
     {
@@ -32,7 +32,7 @@ window.PORTAL_DATA = {
       image: 'assets/practicas/p8-1-image5.png',
       imageAlt: 'Imagen del laboratorio con dos armarios de comunicaciones situados en distintas habitaciones y conectados mediante un cable.',
       imageCaption: 'Referencia visual de la práctica original: la oficina con los dos armarios de comunicaciones.',
-      doc: 'recursos/practica-8-1.docx',
+      doc: 'recursos/practica-8-1.pdf',
       icon: 'rack'
     },
     {
@@ -49,7 +49,7 @@ window.PORTAL_DATA = {
       image: 'assets/practicas/p8-2-image1.png',
       imageAlt: 'Imagen del laboratorio con los switches y los ordenadores distribuidos por las aulas, además de los dos armarios.',
       imageCaption: 'Referencia visual de la práctica original: los switches colocados en sus aulas.',
-      doc: 'recursos/practica-8-2.docx',
+      doc: 'recursos/practica-8-2.pdf',
       icon: 'switch'
     }
   ]

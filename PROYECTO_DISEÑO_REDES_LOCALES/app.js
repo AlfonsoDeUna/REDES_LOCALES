@@ -23,14 +23,14 @@
         '<a class="card-open" href="#practica-' + p.id + '"><h3>' + escape(p.cardTitle) + '</h3></a>' +
         '<p>' + escape(p.description) + '</p>' +
         '<div class="card-footer"><a class="card-action-button" href="#practica-' + p.id + '" aria-label="Ver introducción a la práctica ' + escape(p.number) + '">Ver introducción <span aria-hidden="true">↗</span></a>' +
-        '<a class="card-download" href="' + p.doc + '" download aria-label="Descargar Word original de la práctica ' + escape(p.number) + '">Word <span aria-hidden="true">↓</span></a></div></article>';
+        '<a class="card-download" href="' + p.doc + '" download aria-label="Descargar PDF de la práctica ' + escape(p.number) + '">PDF <span aria-hidden="true">↓</span></a></div></article>';
     }).join('');
   }
 
   function renderResources() {
     $('#resource-list').innerHTML = practices.map(function (p) {
       return '<a class="resource-row" href="' + p.doc + '" download aria-label="Descargar práctica ' + escape(p.number) + ': ' + escape(p.title) + '">' +
-        '<span>' + escape(p.number) + '</span><span class="resource-name"><strong>' + escape(p.shortTitle) + '</strong><small>DOCUMENTO ORIGINAL · WORD (.DOCX)</small></span><span class="download-arrow" aria-hidden="true">↓</span></a>';
+        '<span>' + escape(p.number) + '</span><span class="resource-name"><strong>' + escape(p.shortTitle) + '</strong><small>PRÁCTICA ORIGINAL · PDF</small></span><span class="download-arrow" aria-hidden="true">↓</span></a>';
     }).join('');
   }
 
@@ -40,17 +40,17 @@
       '<p class="sidebar-desc">Conoce el objetivo de cada laboratorio y abre su documento de trabajo.</p>' +
       '<nav class="practice-nav intro-nav" aria-label="Introducciones de los laboratorios">' + practices.map(function (item) {
         return '<a href="#practica-' + item.id + '"' + (item.id === p.id ? ' class="active" aria-current="page"' : '') + '><span class="nav-number">' + escape(item.number) + '</span><span>' + escape(item.shortTitle) + '</span></a>';
-      }).join('') + '</nav><div class="sidebar-resource"><a href="#recursos">↓ Todos los documentos</a><a href="#recorrido">↗ El recorrido del proyecto</a><p>El laboratorio se realiza en Packet Tracer. Las instrucciones están en el Word original.</p></div>';
+      }).join('') + '</nav><div class="sidebar-resource"><a href="#recursos">↓ Todos los documentos</a><a href="#recorrido">↗ El recorrido del proyecto</a><p>El laboratorio se realiza en Packet Tracer. Las instrucciones están en el PDF de la práctica.</p></div>';
 
     const index = practices.indexOf(p);
     const next = practices[index + 1];
     $('#practice-main').innerHTML = '<div class="intro-page"><div class="breadcrumb"><a href="#inicio">Proyecto</a><span aria-hidden="true">/</span><a href="#mision">Introducción</a><span aria-hidden="true">/</span><span>Práctica ' + escape(p.number) + '</span></div>' +
-      '<div class="practice-heading"><span class="large-number" aria-hidden="true">' + escape(p.number) + '</span><div><h1>' + escape(p.title) + '</h1><p>' + escape(p.description) + '</p><a class="text-link intro-mobile-download" href="' + p.doc + '" download>Descargar práctica original ↓</a></div></div>' +
+      '<div class="practice-heading"><span class="large-number" aria-hidden="true">' + escape(p.number) + '</span><div><h1>' + escape(p.title) + '</h1><p>' + escape(p.description) + '</p><a class="text-link intro-mobile-download" href="' + p.doc + '" download>Descargar práctica en PDF ↓</a></div></div>' +
       '<div class="objective"><strong>EL OBJETIVO</strong>' + escape(p.objective) + '</div>' +
       '<div class="intro-copy-grid"><section><h2>¿DE QUÉ TRATA?</h2><p>' + escape(p.about) + '</p></section><section><h2>SU LUGAR EN EL PROYECTO</h2><p>' + escape(p.connection) + '</p></section></div>' +
       '<div class="intro-main-grid"><figure class="intro-picture"><button class="image-button" type="button" data-open-image="' + p.id + '" aria-label="Ampliar la imagen de referencia de la práctica ' + escape(p.number) + '"><img src="' + p.image + '" alt="' + escape(p.imageAlt) + '"><span class="expand-label" aria-hidden="true">Ampliar ↗</span></button><figcaption>' + escape(p.imageCaption) + '</figcaption></figure></div>' +
       '<p class="intro-starting"><strong>Tu punto de partida.</strong> ' + escape(p.startingPoint) + '</p>' +
-      '<section class="original-download"><div><p class="eyebrow">AHORA, ABRE TU LABORATORIO</p><h2>Todo listo para empezar.</h2><p>Descarga el documento de la práctica. Encontrarás las instrucciones, las imágenes de apoyo y lo que debes entregar en el aula virtual.</p><div class="intro-file-info">PRÁCTICA ' + escape(p.number) + ' · WORD ORIGINAL</div></div><a class="button primary" href="' + p.doc + '" download>Descargar práctica <span aria-hidden="true">↓</span></a></section>' +
+      '<section class="original-download"><div><p class="eyebrow">AHORA, ABRE TU LABORATORIO</p><h2>Todo listo para empezar.</h2><p>Descarga el documento de la práctica. Encontrarás las instrucciones, las imágenes de apoyo y lo que debes entregar en el aula virtual.</p><div class="intro-file-info">PRÁCTICA ' + escape(p.number) + ' · PDF</div></div><a class="button primary" href="' + p.doc + '" download>Descargar PDF <span aria-hidden="true">↓</span></a></section>' +
       '<div class="next-practice"><div><p class="small">' + (next ? 'LA SIGUIENTE PRÁCTICA' : 'EL PROYECTO CONTINÚA') + '</p><p>' + escape(next ? next.shortTitle : 'Ya conoces la introducción al proyecto.') + '</p></div><a class="text-link" href="' + (next ? '#practica-' + next.id : '#recorrido') + '">' + (next ? 'Ver introducción' : 'Ver el recorrido') + ' <span aria-hidden="true">→</span></a></div></div>';
   }
 
