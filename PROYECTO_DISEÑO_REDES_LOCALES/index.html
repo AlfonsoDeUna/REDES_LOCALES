@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171b18">
+  <meta name="description" content="Proyecto de diseño de redes locales. Aprende a organizar la vista física de Packet Tracer y construye, paso a paso, tu propia red.">
+  <title>Proyecto de diseño de redes locales</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="content.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Red local. Inicio">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 6h8v8H6zM18 18h8v8h-8z" fill="currentColor"/><path d="M18 6h8v8h-8zM6 18h8v8H6z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <span>red<span class="muted">.</span>local<span class="brand-sub">/ laboratorio de redes</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="#inicio" data-nav="inicio">Proyecto</a>
+      <a href="#mision" data-nav="mision">Primera misión</a>
+      <a href="#recursos" data-nav="recursos">Recursos</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-button icon-button" id="theme-toggle" title="Cambiar a tema claro" aria-label="Cambiar a tema claro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/></svg></button>
+      <a class="header-cta" href="#mision">Abrir prácticas <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <section id="home-view">
+      <div class="hero wrap">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-square"></span> REDES LOCALES / APRENDER CONSTRUYENDO</p>
+          <h1><span class="title-intro">Proyecto de diseño de</span> redes<br class="desktop-break"> locales<span class="cursor" aria-hidden="true">_</span></h1>
+          <p class="hero-lead">Una idea. Un plano. Tu propia red.</p>
+          <p class="hero-description">Aprende a organizar el espacio, tomar decisiones y dar forma a una red local. Empezamos por lo que puedes ver y mover.</p>
+          <div class="hero-actions"><a class="button primary" href="#mision">Ver la introducción <span aria-hidden="true">↗</span></a><a class="text-link" href="#recorrido">Explorar el proyecto <span aria-hidden="true">↓</span></a></div>
+          <div class="hero-tools"><span>PACKET TRACER</span><i aria-hidden="true">+</i><span>DRAW.IO</span><i aria-hidden="true">/</i><span>PROYECTO POR FASES</span></div>
+        </div>
+        <div class="hero-visual">
+          <div class="window-top"><div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>~/proyecto/red-local</span><span class="window-badge">LAB 00</span></div>
+          <div class="diagram-tabs" role="group" aria-label="Comparar las vistas de una red"><button class="active" data-diagram="fisica" aria-pressed="true">Vista física</button><button data-diagram="logica" aria-pressed="false">Vista lógica</button><span>ESQUEMA</span></div>
+          <div class="diagram-area">
+            <svg class="network-map" id="physical-diagram" viewBox="0 0 560 355" role="img" aria-labelledby="map-title map-desc">
+              <title id="map-title">Un edificio con aulas y un armario de comunicaciones</title><desc id="map-desc">Esquema ilustrativo de cuatro aulas. Los equipos de cada aula se conectan con el armario de comunicaciones.</desc>
+              <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" class="svg-grid"/></pattern><symbol id="pc" viewBox="0 0 28 28"><rect x="3" y="3" width="22" height="16" rx="2"/><path d="M14 19v5M8 24h12"/></symbol><symbol id="switch" viewBox="0 0 50 22"><rect x="1" y="1" width="48" height="20" rx="2"/><path d="M7 8h4v5H7zm8 0h4v5h-4zm8 0h4v5h-4zm8 0h4v5h-4z"/><circle cx="42" cy="10" r="1.5"/></symbol></defs>
+              <rect width="560" height="355" fill="url(#grid)"/>
+              <path class="map-floor" d="M36 40H523V311H36Z"/><path class="map-wall" d="M36 160H116m40 0h55V40m0 0v120h75m40 0h67V40m0 120h130M36 208h80m40 0h55v103m0-103h75m40 0h67v103m0-103h130"/>
+              <path class="cable amber" d="M140 111H313V116M454 110H345M140 259H300V132M314 257V141"/>
+              <g class="map-devices"><use href="#pc" x="67" y="87" width="28" height="28"/><use href="#pc" x="67" y="120" width="28" height="28"/><use href="#switch" x="124" y="101" width="38" height="17"/><use href="#pc" x="67" y="244" width="28" height="28"/><use href="#switch" x="124" y="251" width="38" height="17"/><use href="#pc" x="239" y="247" width="28" height="28"/><use href="#switch" x="296" y="251" width="38" height="17"/><use href="#pc" x="454" y="76" width="28" height="28"/><use href="#switch" x="448" y="115" width="38" height="17"/></g>
+              <path class="cable" d="M95 101h29M95 134l29-25M95 258h29M267 260h29M468 103v12"/>
+              <g class="rack-illustration" transform="translate(304 70)"><rect class="rack-outline" width="44" height="74" rx="2"/><rect x="6" y="8" width="32" height="13"/><rect x="6" y="27" width="32" height="13"/><rect x="6" y="46" width="32" height="13"/><path d="M11 14h13m-13 19h13m-13 19h13"/><circle cx="32" cy="14" r="2"/><circle cx="32" cy="33" r="2"/><circle cx="32" cy="52" r="2"/></g>
+              <g class="map-labels"><text x="61" y="65">AULA 107</text><text x="61" y="233">AULA 108</text><text x="235" y="233">AULA 109</text><text x="420" y="65">AULA 110</text><text x="273" y="60">ARMARIO</text><text x="230" y="188" class="corridor-label">ESPACIO · EQUIPOS · CONEXIONES</text></g>
+              <circle class="signal" cx="196" cy="111" r="3"/><circle class="signal delay" cx="300" cy="192" r="3"/>
+            </svg>
+            <svg class="network-map" id="logical-diagram" viewBox="0 0 560 355" role="img" aria-labelledby="logic-title" hidden><title id="logic-title">Esquema lógico de conexión entre un router, un switch y cuatro equipos</title><rect width="560" height="355" fill="url(#grid)"/><path class="cable amber" d="M280 91v58M280 178v43M80 221h400M80 221v38M214 221v38M347 221v38M480 221v38"/><circle class="logic-node" cx="280" cy="65" r="27"/><path class="map-wall" d="M263 65h34m-9-7 9 7-9 7m-16-28v42m-7-33 7-9 7 9"/><use href="#switch" class="map-devices" x="245" y="149" width="70" height="31"/><g class="map-devices"><use href="#pc" x="60" y="259" width="40" height="40"/><use href="#pc" x="194" y="259" width="40" height="40"/><use href="#pc" x="327" y="259" width="40" height="40"/><use href="#pc" x="460" y="259" width="40" height="40"/></g><g class="map-labels"><text x="322" y="68">ROUTER</text><text x="327" y="168">SWITCH</text><text x="58" y="322">PC 01</text><text x="192" y="322">PC 02</text><text x="325" y="322">PC 03</text><text x="458" y="322">PC 04</text></g></svg>
+          </div>
+          <div class="diagram-caption"><span class="status-square"></span><p id="diagram-explanation">Vista física: <strong>dónde está cada dispositivo.</strong></p><span class="tiny">01 / 02</span></div>
+          <p class="diagram-note">Dos ejemplos para explorar qué muestra cada vista.</p>
+        </div>
+      </div>
+      <div class="project-strip"><div class="wrap"><span><span class="strip-number">00</span> TU PUNTO DE PARTIDA</span><p>Antes de diseñar una red, aprende a moverte por ella.</p><a href="#mision">Abrir introducción <span aria-hidden="true">→</span></a></div></div>
+
+      <section class="section wrap" id="mision-section" aria-labelledby="mission-heading">
+        <div class="section-heading"><div><p class="eyebrow">MISIÓN 00 / INTRODUCCIÓN</p><h2 id="mission-heading">Cada equipo,<br>en su lugar.</h2></div><p class="section-lead">Antes de abrir cada laboratorio, conoce de qué trata, qué vas a aprender y para qué te servirá en el proyecto. Después, trabaja con la práctica original.</p></div>
+        <div class="practice-cards" id="practice-cards"></div>
+        <aside class="start-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h7l2 2h9v12H3Z"/><path d="M3 6V4h7l2 2"/></svg><div><strong>Antes de empezar</strong><p>Necesitas Packet Tracer y el archivo de tu práctica anterior (práctica 5 en el material original). Abre tu entrega del aula virtual o pide el archivo al profesor.</p></div></aside>
+      </section>
+
+      <section class="journey-section" id="recorrido-section" aria-labelledby="journey-heading"><div class="wrap section"><div class="section-heading"><div><p class="eyebrow">EL RECORRIDO / PASO A PASO</p><h2 id="journey-heading">Hoy exploras.<br>Después, diseñas.</h2></div><p class="section-lead">Este portal crecerá con el proyecto. La introducción ya está disponible; las siguientes fases se irán incorporando en clase.</p></div><ol class="journey"><li class="current"><span class="journey-num">00</span><h3>Explorar</h3><p>La vista física,<br>los equipos y los armarios.</p><span class="status-tag">DISPONIBLE</span></li><li><span class="journey-num">01</span><h3>Planificar</h3><p>Entender el espacio<br>y las necesidades.</p><span class="future-tag">PRÓXIMAMENTE</span></li><li><span class="journey-num">02</span><h3>Dibujar</h3><p>Dar forma al diseño<br>con draw.io.</p><span class="future-tag">PRÓXIMAMENTE</span></li><li><span class="journey-num">03</span><h3>Construir</h3><p>Implementar la red<br>en Packet Tracer.</p><span class="future-tag">PRÓXIMAMENTE</span></li><li><span class="journey-num">04</span><h3>Presentar</h3><p>Comprobar, documentar<br>y justificar decisiones.</p><span class="future-tag">PRÓXIMAMENTE</span></li></ol></div></section>
+
+      <section class="section wrap resources-section" id="recursos-section" aria-labelledby="resources-heading"><div class="section-heading"><div><p class="eyebrow">TU MESA DE TRABAJO</p><h2 id="resources-heading">A mano.</h2></div><p class="section-lead">Tus tres documentos originales de trabajo, reunidos en un mismo lugar. Descárgalos y sigue las instrucciones de cada práctica.</p></div><div class="resource-layout"><div id="resource-list" class="resource-list"></div><div class="resource-side"><span class="resource-icon" aria-hidden="true">↳</span><h3>Del plano a la red</h3><p>Más adelante dibujarás tu propuesta en draw.io. Puedes abrir la herramienta desde aquí.</p><a class="text-link" href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">Abrir draw.io <span aria-hidden="true">↗</span></a><p class="small muted">Se abre en otra pestaña.</p></div></div><p class="source-note">Documentos originales facilitados por el profesor. Las instrucciones de realización y de entrega están en cada Word.</p></section>
+    </section>
+
+    <section id="practice-view" class="practice-view wrap" hidden aria-label="Introducción a la práctica"><aside class="practice-sidebar" id="practice-sidebar"></aside><div class="practice-main" id="practice-main"></div></section>
+    
+  </main>
+
+  <footer class="site-footer wrap"><a class="brand small" href="#inicio">red.local<span class="muted"> / construir para comprender</span></a><p>Proyecto de diseño de redes locales <span class="footer-divider">/</span> Packet Tracer + draw.io</p></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog id="image-dialog" class="image-dialog" aria-labelledby="image-dialog-title"><div class="dialog-toolbar"><p id="image-dialog-title"></p><button class="icon-button" id="close-image" aria-label="Cerrar imagen">×</button></div><div id="image-dialog-content"></div></dialog>
+  <noscript><div class="noscript-note">Activa JavaScript para ver las presentaciones de las prácticas. También puedes descargar las guías: <a href="recursos/practica-7.docx">Práctica 7</a>, <a href="recursos/practica-8-1.docx">Práctica 8.1</a> y <a href="recursos/practica-8-2.docx">Práctica 8.2</a>.</div></noscript>
+</body>
+</html>
