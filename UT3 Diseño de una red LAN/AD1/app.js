@@ -13,6 +13,14 @@ let index=0,mode='mark',start=null,img=new Image(),cursor=null;const canvas=$('#
 function save(){try{localStorage.setItem('ad1-network-v1',JSON.stringify(state));$('#saved').textContent='Guardado local en este navegador.'}catch{$('#saved').textContent='No se pudo guardar. Descarga tu entrega para conservarla.'}}
 function render(c=canvas,im=img,marks=state.marks[index]){const x=c.getContext('2d');c.width=im.naturalWidth;c.height=im.naturalHeight;x.fillStyle='white';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0);const scale=c.width/800;marks.forEach((m,i)=>{x.lineWidth=3*scale;x.strokeStyle='#087ee0';x.fillStyle='#125c4b';if(m.type==='line'){x.beginPath();x.moveTo(m.x*c.width,m.y*c.height);x.lineTo(m.ex*c.width,m.ey*c.height);x.stroke()}else{let px=m.x*c.width,py=m.y*c.height;x.beginPath();x.arc(px,py,12*scale,0,7);x.fill();x.fillStyle='white';x.font=`bold ${11*scale}px Arial`;x.textAlign='center';x.textBaseline='middle';x.fillText(i+1,px,py);x.font=`${11*scale}px Arial`;const w=x.measureText(m.label).width+12*scale;let tx=Math.max(0,Math.min(px+15*scale,c.width-w));let ty=Math.max(0,Math.min(py-28*scale,c.height-22*scale));x.fillStyle='#fff';x.fillRect(tx,ty,w,21*scale);x.strokeStyle='#125c4b';x.lineWidth=scale;x.strokeRect(tx,ty,w,21*scale);x.fillStyle='#172e32';x.textAlign='left';x.fillText(m.label,tx+6*scale,ty+10.5*scale)}});if(c===canvas){$('#count').textContent=marks.length+' marcas';if(start){x.fillStyle='#d88000';x.beginPath();x.arc(start.x*c.width,start.y*c.height,6*scale,0,7);x.fill()}if(cursor){x.strokeStyle='#d88000';x.lineWidth=2;x.strokeRect(cursor.x*c.width-8,cursor.y*c.height-8,16,16)}}}
 function activate(i){termsPanel.hidden=i!==3;index=i;start=null;cursor=null;const a=activities[i];$('#step').textContent=`ACTIVIDAD 0${i+1} / 05`;$('#title').textContent=a.title;$('#brief').textContent=a.brief;$('#tasks').replaceChildren(...a.tasks.map(t=>{const li=document.createElement('li');li.textContent=t;return li}));$('#note').textContent=a.note;
+
+$('#extension-link')?.remove();
+if(i===4){
+ const link=document.createElement('a');link.id='extension-link';link.className='primary';
+ link.href='ampliacion.html';link.textContent='Tarea de ampliación →';
+ $('#note').after(link);
+}
+
 $('#reference-resource')?.remove();
 if(i===3){
  const resource=document.createElement('aside');resource.id='reference-resource';resource.className='note';resource.style.background='#e8efe6';
